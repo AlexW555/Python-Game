@@ -1,6 +1,6 @@
 # import the pygame module, so you can use it
 import pygame
-import math
+import random
 pygame.init()
 
 #Define some colours
@@ -11,7 +11,7 @@ RED = (255,0,0)
 
 PI = 3.141592653
 
-size = (700,500)
+size = (400,400)
 screen = pygame.display.set_mode(size)
 
 pygame.display.set_caption("Professor Craven's Cool Game")
@@ -22,6 +22,21 @@ done = False
 # Used to manage how fast the screen updates
 clock = pygame.time.Clock()
 
+
+rect_x = 50
+rect_y = 50
+
+rect_change_x = 5
+rect_change_y = 5
+
+snow_list = []
+
+for i in range(50):
+        x = random.randrange(0,400)
+        y = random.randrange(0,400)
+        snow_list.append([x,y])
+
+        
 #-------- Main Program Loop --------
 while not done:
     # ---- Main event loop ------
@@ -43,23 +58,44 @@ while not done:
 # First clear the screen to white. Dont put draw commands above this as it
 # will be erased.
     screen.fill(WHITE)
-    pygame.draw.rect(screen, RED, (55,50,20,25),0)
-    pygame.draw.line(screen, GREEN, [0,0],[100,100],5)
 
+    
+    pygame.draw.rect(screen, BLACK, (rect_x,rect_y,50,50))
+    pygame.draw.rect(screen, RED, (rect_x + 10,rect_y + 10,30,30))
+    rect_x += rect_change_x
+    rect_y += rect_change_y
+
+    if rect_y > 350 or rect_y < 0:
+        rect_change_y = rect_change_y * -1
+    if rect_x > 350 or rect_x < 0:
+        rect_change_x = rect_change_x * -1
+
+    
+
+    for i in range(len(snow_list)):
+        pygame.draw.circle(screen, BLACK, snow_list[i], 2)
+
+        snow_list[i][1] += 1
+
+        if snow_list[i][1] > 400:
+            #Reset it to just above the top of the screen
+            y = random.randrange(-50, -10)
+            snow_list[i][1] = y
+            #Give new X Position
+            x = random.randrange(0,400)
+            snow_list[i][0] = x
+        
+    
+
+
+    score = 20
+    font = pygame.font.SysFont('Calibri', 25, True, False)
+    text = font.render("Score: " + str(score), True, BLACK)
+
+    screen.blit(text, [250,250])
+    
     #Draw on the screen several times from 0,10 to 100,110
 
-    y_offset = 0
-    for y_offset in range(0,100,10):
-        pygame.draw.line(screen, RED, [0,10+y_offset],[100,110+y_offset],5)
-
-    for i in range(200):
-        radians_x = i / 20
-        radians_y = i / 6
-
-        x = int(75*math.sin(radians_x)) + 200
-        y = int(75*math.cos(radians_y)) + 200
-
-        pygame.draw.line(screen, BLACK, [x,y], [x+5,y], 5)
 
 # --- Update the screen with what we have drawn
     pygame.display.flip()
